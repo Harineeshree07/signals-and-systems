@@ -1,0 +1,31 @@
+clc; clear; close all;
+A = 1;              
+f0 = 1;             
+T = 1/f0;           
+N = 10;             
+t_period = linspace(0, T, 2000);
+x_period = A * sin(2*pi*f0*t_period);
+x_period(x_period < 0) = 0; 
+a0 = (1/T) * trapz(t_period, x_period);
+an = zeros(1, N);
+bn = zeros(1, N);
+for k = 1:N
+    an(k) = (2/T) * trapz(t_period, x_period .* cos(2*pi*k*f0*t_period));
+    bn(k) = (2/T) * trapz(t_period, x_period .* sin(2*pi*k*f0*t_period));
+end
+t = linspace(0, 2*T, 4000);
+x = A * sin(2*pi*f0*t);
+x(x < 0) = 0;
+xFS = a0 * ones(size(t));
+for k = 1:N
+    xFS = xFS + an(k)*cos(2*pi*k*f0*t) + bn(k)*sin(2*pi*k*f0*t);
+end
+figure;
+plot(t, x, 'k', 'LineWidth', 1.5);
+hold on;
+plot(t, xFS, 'r--', 'LineWidth', 1.5);
+grid on;
+xlabel('Time (s)');
+ylabel('Amplitude');
+title(sprintf('Fourier Series Reconstruction of Half-Wave Rectified Wave (N = %d)', N));
+legend('Original Signal', 'Fourier Series Reconstruction', 'Location', 'northeast');
